@@ -5,6 +5,8 @@ class ApiConstants {
   static String feedback = '/feedbacks/';
   static String generateQR = '/station/generateQR/';
   static String feedbackinfo = '/feedbacks/info/';
-
-
+  static String chartRoute = '/chart/';
+  static String stationRoute = '/station/';
+  static String totalFeedback = '/total/station/';
+  static String averageForStation = 'average/station/';
 }

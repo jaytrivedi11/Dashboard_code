@@ -39,7 +39,10 @@ class MyApp extends StatelessWidget {
             create: (context) => MenuController(),
           ),
         ],
-        child: isLogged ? DashBoardScreen1() : LoginScreen(),
+        child: isLogged
+            ? DefaultScreen()
+            // ? DashBoardScreen1()
+            : LoginScreen(),
       ),
     );
   }
