@@ -6,8 +6,8 @@ import 'package:admin/network/ApiService.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-
 import '../../../constants.dart';
+import 'package:intl/intl.dart';
 
 class RecentFiles extends StatelessWidget {
   const RecentFiles({
@@ -17,10 +17,10 @@ class RecentFiles extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: ApiService().getFeedbackByPolicestation(),
-      builder: (context, snapshot) {
-        if(snapshot.hasData){
-          List<dynamic> list = jsonDecode(snapshot.data.toString());
+        future: ApiService().getFeedbackByPolicestation(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            List<dynamic> list = jsonDecode(snapshot.data.toString());
             return Container(
               padding: EdgeInsets.all(defaultPadding),
               decoration: BoxDecoration(
@@ -38,8 +38,9 @@ class RecentFiles extends StatelessWidget {
                     width: double.infinity,
                     child: SingleChildScrollView(
                       child: DataTable2(
-                        columnSpacing: defaultPadding,
-                        minWidth: 600,
+                        // columnSpacing: defaultPadding,
+                        // minWidth: 600,
+                        columnSpacing: 0,
                         dataRowHeight: 70,
                         columns: [
                           DataColumn(
@@ -62,8 +63,9 @@ class RecentFiles extends StatelessWidget {
                           ),
                         ],
                         rows: List.generate(
-                        list.length,
-                          (index) => recentFileDataRow( FeedbackModel.fromJson(list[index]),index),
+                          list.length,
+                          (index) => recentFileDataRow(
+                              FeedbackModel.fromJson(list[index]), index),
                         ),
                       ),
                     ),
@@ -71,25 +73,25 @@ class RecentFiles extends StatelessWidget {
                 ],
               ),
             );
-          }else{
-          return Center(
-            child: CircularProgressIndicator(
-              strokeWidth: 1,
-            ),
-          );
-        }
-        }
-    );
+          } else {
+            return Center(
+              child: CircularProgressIndicator(
+                strokeWidth: 1,
+              ),
+            );
+          }
+        });
   }
 }
 
-DataRow recentFileDataRow(FeedbackModel fileInfo,int position) {
+DataRow recentFileDataRow(FeedbackModel fileInfo, int position) {
   return DataRow(
     cells: [
-      DataCell(Text("${position+1}")),
+      DataCell(Text("${position + 1}")),
       DataCell(Text(fileInfo.name!)),
       DataCell(Text(fileInfo.mobile!)),
-      DataCell(Text(fileInfo.date!) ),
+      DataCell(Text(
+          DateFormat('dd-MM-yyyy').format(DateTime.parse(fileInfo.date!)))),
       // DataCell(Text(fileInfo.policestationID!)),
       DataCell(Text(fileInfo.feedback!)),
     ],

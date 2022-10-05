@@ -3,6 +3,6 @@ class ApiConstants {
   static String login = '/login';
   static String stationDetails = '/station/info/';
   static String feedback = '/feedbacks/';
-
+  static String generateQR = '/station/generateQR/';
 
 }

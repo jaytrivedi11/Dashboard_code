@@ -1,10 +1,14 @@
+import 'package:admin/network/ApiConstant.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../controllers/MenuController.dart';
 import '../responsive.dart';
 import 'main/components/side_menu.dart';
+import 'package:http/http.dart' as http;
+import 'dart:html' as html;
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({Key? key}) : super(key: key);
@@ -34,12 +38,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
               // It takes 5/6 part of the screen
               flex: 5,
               child: Scaffold(
-                body: Center(child: Text("Settings Screen",),),
+                body: Center(
+                    child: ElevatedButton(
+                        onPressed: generateQR, child: Text("Generate QR"))),
               ),
             ),
           ],
         ),
-      ) ,
+      ),
     );
+  }
+
+  void generateQR() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var stationID = prefs.getString('stationID');
+    var url = ApiConstants.baseUrl + ApiConstants.generateQR + stationID!;
+
+    html.AnchorElement anchorElement = new html.AnchorElement(href: url);
+    anchorElement.download = url;
+    anchorElement.click();
   }
 }

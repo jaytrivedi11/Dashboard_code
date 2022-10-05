@@ -6,8 +6,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'ApiConstant.dart';
 import 'package:http/http.dart' as http;
 
-class ApiService{
-  Future<bool> login(String email,String password) async {
+class ApiService {
+  Future<bool> login(String email, String password) async {
     try {
       var url = Uri.parse(ApiConstants.baseUrl + ApiConstants.login);
 
@@ -28,7 +28,6 @@ class ApiService{
         prefs.setString("stationID", res['stationID']);
         prefs.setString("token", res["token"]);
         if (res.containsKey("stationID")) {
-
           return true;
         } else {
           return false;
@@ -44,12 +43,12 @@ class ApiService{
   Future<bool> getStationDetails() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var stationID = prefs.getString("stationID")!;
-    var url = Uri.parse(ApiConstants.baseUrl + ApiConstants.stationDetails + stationID);
+    var url = Uri.parse(
+        ApiConstants.baseUrl + ApiConstants.stationDetails + stationID);
 
     var res = await http.get(url);
-    if(res.statusCode == 200){
+    if (res.statusCode == 200) {
       var response = jsonDecode(res.body);
-
 
       prefs.setString("name", response["name"]);
       prefs.setString("address", response["address"]);
@@ -60,20 +59,19 @@ class ApiService{
     }
     return false;
   }
+
   Future<String> getFeedbackByPolicestation() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var stationID = prefs.getString("stationID")!;
-    var url = Uri.parse(ApiConstants.baseUrl + ApiConstants.feedback + stationID);
-
-
+    var url =
+        Uri.parse(ApiConstants.baseUrl + ApiConstants.feedback + stationID);
 
     var res = await http.get(url);
     var response = jsonDecode(res.body);
-    if(res.statusCode == 200){
+    if (res.statusCode == 200) {
       List<dynamic> list = jsonDecode(res.body);
       FeedbackModel feedback = FeedbackModel.fromJson(list[0]);
       print(feedback.feedback);
-
 
       return res.body;
     }
