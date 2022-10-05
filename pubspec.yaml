@@ -41,6 +41,7 @@ dependencies:
   intl: ^0.17.0
   flutter_rating_bar: ^4.0.1
   syncfusion_flutter_charts: ^20.3.47
+  qr_flutter: ^4.0.0
 
 dev_dependencies:
   flutter_test:

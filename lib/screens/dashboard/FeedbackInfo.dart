@@ -59,8 +59,7 @@ class _FeedbackInfoState extends State<FeedbackInfo> {
                                 color: secondaryColor,
                                 borderRadius: const BorderRadius.all(Radius.circular(10)),
                               ),
-                              width:size.width*0.7,
-                              height: 500,
+
                               child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                 children:[

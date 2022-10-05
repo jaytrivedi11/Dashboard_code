@@ -107,19 +107,49 @@ class SideMenu extends StatelessWidget {
           DrawerListTile(
             title: "Logout",
             svgSrc: "assets/icons/menu_setting.svg",
-            press: () async {
-              SharedPreferences prefs = await SharedPreferences.getInstance();
-              prefs.clear();
-              // Navigator.of(context).pop();
-              Navigator.of(context).pushReplacement(CupertinoPageRoute(builder: (context) => MultiProvider(
-                providers: [
-                  ChangeNotifierProvider(
-                    create: (context) => MenuController(),
+            press: ()=>showDialog<String>(
+              context: context,
+              builder: (BuildContext context) => AlertDialog(
+                title: const Text('Logout'),
+                content: const Text('Are you sure you want to logout?'),
+                actions: <Widget>[
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, 'Cancel'),
+                    child: const Text('Cancel'),
+                  ),
+                  TextButton(
+                    onPressed: () async{
+                      SharedPreferences prefs = await SharedPreferences.getInstance();
+                      prefs.clear();
+                      // Navigator.of(context).pop();
+                      Navigator.of(context).pushReplacement(CupertinoPageRoute(builder: (context) => MultiProvider(
+                        providers: [
+                          ChangeNotifierProvider(
+                            create: (context) => MenuController(),
+                          ),
+                        ],
+                        child: LoginScreen(),
+                      ),));
+                    },
+                    child: const Text('OK'),
                   ),
                 ],
-                child: LoginScreen(),
-              ),));
-            },
+              ),
+            ),
+            // press: () async {
+            //
+            //   SharedPreferences prefs = await SharedPreferences.getInstance();
+            //   prefs.clear();
+            //   // Navigator.of(context).pop();
+            //   Navigator.of(context).pushReplacement(CupertinoPageRoute(builder: (context) => MultiProvider(
+            //     providers: [
+            //       ChangeNotifierProvider(
+            //         create: (context) => MenuController(),
+            //       ),
+            //     ],
+            //     child: LoginScreen(),
+            //   ),));
+            // },
           ),
         ],
       ),
