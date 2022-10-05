@@ -11,45 +11,70 @@ class StarageDetails extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.all(defaultPadding),
-      decoration: BoxDecoration(
-        color: secondaryColor,
-        borderRadius: const BorderRadius.all(Radius.circular(10)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            "Feedback Details",
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w500,
-            ),
+    return Column(
+      children: [
+        Container(
+          padding: EdgeInsets.all(defaultPadding),
+          decoration: BoxDecoration(
+            color: secondaryColor,
+            borderRadius: const BorderRadius.all(Radius.circular(10)),
           ),
-          SizedBox(height: defaultPadding),
-          Chart(),
-          StorageInfoCard(
-            svgSrc: Colors.indigo,
-            title: "Modrate",
-            amountOfFiles: "",
-            numOfFiles: 200,
-          ),
-          StorageInfoCard(
-           svgSrc: Colors.green,
-            title: "Positive",
-            amountOfFiles: "",
-            numOfFiles: 300,
-          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Feedback Details",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              SizedBox(height: defaultPadding,),
 
-          StorageInfoCard(
-            svgSrc: Colors.red,
-            title: "Nutral",
-            amountOfFiles: "",
-            numOfFiles: 100,
+            ],
           ),
-        ],
-      ),
+        ),
+        Container(
+          padding: EdgeInsets.all(defaultPadding),
+          decoration: BoxDecoration(
+            color: secondaryColor,
+            borderRadius: const BorderRadius.all(Radius.circular(10)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Feedback Details",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              SizedBox(height: defaultPadding),
+              Chart(),
+              StorageInfoCard(
+                svgSrc: Colors.indigo,
+                title: "Modrate",
+                amountOfFiles: "",
+                numOfFiles: 200,
+              ),
+              StorageInfoCard(
+               svgSrc: Colors.green,
+                title: "Positive",
+                amountOfFiles: "",
+                numOfFiles: 300,
+              ),
+
+              StorageInfoCard(
+                svgSrc: Colors.red,
+                title: "Nutral",
+                amountOfFiles: "",
+                numOfFiles: 100,
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

@@ -3,11 +3,15 @@ import 'dart:convert';
 import 'package:admin/models/RecentFile.dart';
 import 'package:admin/models/feedback.dart';
 import 'package:admin/network/ApiService.dart';
+import 'package:admin/screens/dashboard/FeedbackInfo.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:provider/provider.dart';
 
 import '../../../constants.dart';
+import '../../../controllers/MenuController.dart';
+import '../../DefaultScreen.dart';
 
 class RecentFiles extends StatelessWidget {
   const RecentFiles({
@@ -30,6 +34,18 @@ class RecentFiles extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  DropdownButton<String>(
+                    items: <String>['A', 'B', 'C', 'D'].map((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                    onChanged: (value) {
+                      value="jay";
+
+                    },
+                  ),
                   Text(
                     "Recent Feedback",
                     style: Theme.of(context).textTheme.subtitle1,
@@ -63,7 +79,7 @@ class RecentFiles extends StatelessWidget {
                         ],
                         rows: List.generate(
                         list.length,
-                          (index) => recentFileDataRow( FeedbackModel.fromJson(list[index]),index),
+                          (index) => recentFileDataRow( FeedbackModel.fromJson(list[index]),index,context),
                         ),
                       ),
                     ),
@@ -83,8 +99,18 @@ class RecentFiles extends StatelessWidget {
   }
 }
 
-DataRow recentFileDataRow(FeedbackModel fileInfo,int position) {
-  return DataRow(
+DataRow recentFileDataRow(FeedbackModel fileInfo,int position,BuildContext context) {
+  return DataRow2(
+    onTap: (){
+      Navigator.push(context, PageRouteBuilder(pageBuilder: (context, animation, secondaryAnimation) => MultiProvider(
+        providers: [
+          ChangeNotifierProvider(
+            create: (context) => MenuController(),
+          ),
+        ],
+        child: FeedbackInfo(feedbackId: fileInfo.sId,),
+      ),transitionDuration: Duration.zero, reverseTransitionDuration: Duration.zero,),);
+    },
     cells: [
       DataCell(Text("${position+1}")),
       DataCell(Text(fileInfo.name!)),
