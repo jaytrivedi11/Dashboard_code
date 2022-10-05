@@ -51,7 +51,7 @@ class _LoginScreenState extends State<LoginScreen> {
             SizedBox(
               child: Padding(
                 padding: const EdgeInsets.only(left: 20.0),
-                child: Image.asset("images/logo.png")
+                child: Image.asset("assets/images/logo.png")
               ),
               width: size.width*0.3,
               height: size.height*0.3,
@@ -66,6 +66,10 @@ class _LoginScreenState extends State<LoginScreen> {
             // ),
             const SizedBox(
               height: 10,
+            ),
+            Text(
+              'Gujarat Police',
+              style: kLoginTitleStyle(size),
             ),
 
             SizedBox(
