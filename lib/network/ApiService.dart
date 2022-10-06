@@ -24,14 +24,21 @@ class ApiService {
       );
       print(response.body);
       if (response.statusCode == 200) {
+
         Map res = jsonDecode(response.body);
-        prefs.setString("stationID", res['stationID']);
         prefs.setString("token", res["token"]);
-        if (res.containsKey("stationID")) {
-          return true;
-        } else {
-          return false;
+        prefs.setInt("level", res["level"]);
+        if(res["level"] == 0){
+          prefs.setString("stationID", res['stationID']);
+
         }
+        else if(res["level"] == 1){
+          prefs.setString("subdivisionID", res["subdivisionID"]);
+        }
+        else if (res["level"] == 2){
+          prefs.setString("districtID", res['districtID']);
+        }
+        return true;
       } else {
         return false;
       }

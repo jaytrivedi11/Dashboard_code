@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:admin/constants.dart';
 import 'package:admin/network/ApiConstant.dart';
 import 'package:admin/network/ApiService.dart';
+import 'package:admin/screens/dashboard/components/recent_files.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -23,7 +24,7 @@ class DefaultScreen extends StatefulWidget {
 class _DefaultScreenState extends State<DefaultScreen> {
   bool isLoading = true;
   bool isNumLoading = true;
-  var stationID = "";
+  var id = "";
   var time = "weekly";
   var optionsQ1 = {
     "0": "Through a person known to a police officer",
@@ -46,11 +47,26 @@ class _DefaultScreenState extends State<DefaultScreen> {
 
   getID() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    if (prefs.containsKey("stationID")) {
-      setState(() {
-        isLoading = false;
-        stationID = prefs.getString("stationID")!;
-      });
+    if (prefs.containsKey("level")) {
+      switch(prefs.getInt("level")){
+        case 0:
+          setState(() {
+            isLoading = false;
+            id = prefs.getString("stationID")!;
+          });
+          break;
+        case 1:
+          setState(() {
+            isLoading = false;
+            id = prefs.getString("subdivisionID")!;
+          });
+          break;
+        case 2:
+          setState(() {
+            isLoading = false;
+            id = prefs.getString("districtID")!;
+          });
+      }
       getNumbers();
     }
   }
@@ -125,7 +141,7 @@ class _DefaultScreenState extends State<DefaultScreen> {
                                         ApiConstants.chartRoute +
                                         time +
                                         ApiConstants.stationRoute +
-                                        stationID,
+                                        id,
                                   )),
                                   builder: (context, snapshot) {
                                     if (snapshot.hasData) {
@@ -185,6 +201,10 @@ class _DefaultScreenState extends State<DefaultScreen> {
                             ? Row(children: getOtherData(size))
                             : Column(children: getOtherData(size)),
                       ),
+                      Padding(
+                        padding: const EdgeInsets.all(18.0),
+                        child: RecentFiles(),
+                      )
                     ],
                   ),
                 ),
@@ -229,7 +249,7 @@ class _DefaultScreenState extends State<DefaultScreen> {
                               ApiConstants.chartRoute +
                               time +
                               ApiConstants.totalFeedback +
-                              stationID,
+                              id,
                         ),
                       ),
                       builder: (context, snapshot) {
@@ -296,7 +316,7 @@ class _DefaultScreenState extends State<DefaultScreen> {
                     ApiConstants.baseUrl +
                         ApiConstants.chartRoute +
                         ApiConstants.averageForStation +
-                        stationID,
+                        id,
                   ),
                 ),
                 builder: (context, snapshot) {
@@ -337,7 +357,7 @@ class _DefaultScreenState extends State<DefaultScreen> {
                     ApiConstants.chartRoute +
                     time +
                     "/q1/" +
-                    stationID,
+                    id,
               )),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
@@ -402,7 +422,7 @@ class _DefaultScreenState extends State<DefaultScreen> {
                     ApiConstants.chartRoute +
                     time +
                     "/q2/" +
-                    stationID,
+                    id,
               )),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {

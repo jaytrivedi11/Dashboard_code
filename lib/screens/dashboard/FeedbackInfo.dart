@@ -63,10 +63,7 @@ class _FeedbackInfoState extends State<FeedbackInfo> {
                               child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                 children:[
-                                  Text(
-                                    'Feedbcak info',
-                                    style: kLoginTitleStyle(size*0.5),
-                                  ),
+                                    
 
                                   SizedBox(height: 50,),
 

@@ -1,9 +1,13 @@
+import 'dart:convert';
+
 import 'package:admin/network/ApiService.dart';
 import 'package:admin/responsive.dart';
 import 'package:admin/screens/dashboard/components/my_fields.dart';
+import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 
 import '../../constants.dart';
+import '../../models/feedback.dart';
 import 'components/header.dart';
 
 import 'components/recent_files.dart';
@@ -25,6 +29,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
+
     return SafeArea(
       child: FutureBuilder(
         future: ApiService().getStationDetails(),
@@ -46,7 +52,90 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           children: [
                             // MyFiles(),
                             SizedBox(height: defaultPadding),
-                            RecentFiles(),
+                            FutureBuilder(
+                                future: ApiService().getFeedbackByPolicestation(),
+                                builder: (context, snapshot) {
+                                  if (snapshot.hasData) {
+                                    List<dynamic> list = jsonDecode(snapshot.data.toString());
+                                    return Column(
+                                      children: [
+                                        const SizedBox(
+                                          // height: 50,
+                                        ),
+                                        Responsive.isDesktop(context)
+                                            ? Row(
+                                            children: getDropdown(size)
+
+
+
+                                        )
+                                            : Column(
+                                          children: getDropdown(size),
+                                        ),
+                                        const SizedBox(
+                                          height: 20,
+                                        ),
+                                        Container(
+                                          padding: EdgeInsets.all(defaultPadding),
+                                          decoration: BoxDecoration(
+                                            color: secondaryColor,
+                                            borderRadius: const BorderRadius.all(Radius.circular(10)),
+                                          ),
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                "Recent Feedback",
+                                                style: Theme.of(context).textTheme.subtitle1,
+                                              ),
+                                              SizedBox(
+                                                width: double.infinity,
+                                                child: SingleChildScrollView(
+                                                  child: DataTable2(
+                                                    // columnSpacing: defaultPadding,
+                                                    // minWidth: 600,
+                                                    columnSpacing: 0,
+                                                    dataRowHeight: 70,
+                                                    columns: [
+                                                      DataColumn(
+                                                        label: Text("Sr.no"),
+                                                      ),
+                                                      DataColumn(
+                                                        label: Text("Name"),
+                                                      ),
+                                                      DataColumn(
+                                                        label: Text("Mobile no"),
+                                                      ),
+                                                      DataColumn(
+                                                        label: Text("Date"),
+                                                      ),
+                                                      // DataColumn(
+                                                      //   label: Text("Police Station"),
+                                                      // ),
+                                                      DataColumn(
+                                                        label: Text("FeedBack"),
+                                                      ),
+                                                    ],
+                                                    rows: List.generate(
+                                                      list.length,
+                                                          (index) => recentFileDataRow( FeedbackModel.fromJson(list[index]),index,context),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    );
+                                  } else {
+                                    return Center(
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 1,
+                                      ),
+                                    );
+                                  }
+                                }),
                             if (Responsive.isMobile(context))
                               SizedBox(height: defaultPadding),
                             if (Responsive.isMobile(context)) StarageDetails(),
@@ -76,5 +165,92 @@ class _DashboardScreenState extends State<DashboardScreen> {
         },
       ),
     );
+  }
+  getDropdown(Size size) {
+    DateTime? datel;
+    return [
+      Text("       Select the Dates     ",
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+          )),
+      Container(
+        width:
+        Responsive.isDesktop(context) ? size.width * 0.1 : size.width * 0.8,
+        padding: EdgeInsets.symmetric(horizontal: 10),
+        decoration: BoxDecoration(
+          borderRadius: const BorderRadius.all(
+            Radius.circular(10),
+          ),
+          border: Border.all(
+            color: primaryColor,
+            width: 0.5,
+          ),
+        ),
+        child: Column(
+          children: [
+            DropdownButton<DateTime>(
+              items: [
+                'Choose A Date'
+              ].map((e) => DropdownMenuItem<DateTime>(child: Text(e))).toList(),
+              alignment: Alignment.center,
+              isExpanded: true,
+              value: datel,
+              underline: Container(),
+              onChanged: ( value) {
+                showDatePicker(context: context, initialDate: DateTime.now(), firstDate: DateTime(2001), lastDate: DateTime(2099)
+                ).then((date) {
+
+                  setState(() {
+                    datel=date;
+
+                  });
+                });
+                // time = value.toString();
+                // setState(() {});
+              },
+            ),
+
+
+          ],
+        ),
+      ),
+      SizedBox(width: 10,),
+
+      Container(
+        width:
+        Responsive.isDesktop(context) ? size.width * 0.1 : size.width * 0.8,
+        padding: EdgeInsets.symmetric(horizontal: 10),
+        decoration: BoxDecoration(
+          borderRadius: const BorderRadius.all(
+            Radius.circular(10),
+          ),
+          border: Border.all(
+            color: primaryColor,
+            width: 0.5,
+          ),
+        ),
+        child: Column(
+          children: [
+            DropdownButton(
+              items: [
+                const DropdownMenuItem(value: "weekly", child: Text("This Week")),
+                const DropdownMenuItem(value: "monthly", child: Text("This Month")),
+                const DropdownMenuItem(value: "yearly", child: Text("This Year")),
+              ],
+              alignment: Alignment.center,
+              isExpanded: true,
+              underline: Container(),
+              onChanged: (value) {
+                setState(() {});
+              },
+            ),
+
+
+          ],
+        ),
+      ),
+
+    ];
   }
 }

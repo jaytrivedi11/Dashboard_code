@@ -7,13 +7,38 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../controllers/MenuController.dart';
+import '../../AllFeedback.dart';
 import '../../DefaultScreen.dart';
 import '../../SettingsScreen.dart';
 
-class SideMenu extends StatelessWidget {
+class SideMenu extends StatefulWidget {
   const SideMenu({
     Key? key,
   }) : super(key: key);
+
+  @override
+  State<SideMenu> createState() => _SideMenuState();
+}
+
+class _SideMenuState extends State<SideMenu> {
+
+  int level = 0;
+
+  @override
+  void initState() {
+    getLevel();
+    super.initState();
+  }
+
+  getLevel() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    if(prefs.containsKey("level")){
+      level = prefs.getInt("level")!;
+      setState(() {
+
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,6 +50,31 @@ class SideMenu extends StatelessWidget {
           ),
           DrawerListTile(
             title: "Dashboard",
+            // svgSrc: "assets/icons/menu_profile.svg",
+            svgSrc: "assets/icons/menu_dashbord.svg",
+            press: () {
+              // Navigator.of(context).pushReplacement(CupertinoPageRoute(builder: (context) => MultiProvider(
+              //   providers: [
+              //     ChangeNotifierProvider(
+              //       create: (context) => MenuController(),
+              //     ),
+              //   ],
+              //   child: DefaultScreen(),
+              // ),));
+
+              Navigator.pushReplacement(context, PageRouteBuilder(pageBuilder: (context, animation, secondaryAnimation) => MultiProvider(
+                providers: [
+                  ChangeNotifierProvider(
+                    create: (context) => MenuController(),
+                  ),
+                ],
+                child: DefaultScreen(),
+              ),transitionDuration: Duration.zero, reverseTransitionDuration: Duration.zero,),);
+
+            },
+          ),
+          DrawerListTile(
+            title: "Feedbacks",
             svgSrc: "assets/icons/menu_dashbord.svg",
             press: () {
               Navigator.pushReplacement(context, PageRouteBuilder(pageBuilder: (context, animation, secondaryAnimation) => MultiProvider(
@@ -64,30 +114,7 @@ class SideMenu extends StatelessWidget {
           //   svgSrc: "assets/icons/menu_notification.svg",
           //   press: () {},
           // ),
-          DrawerListTile(
-            title: "Profile",
-            svgSrc: "assets/icons/menu_profile.svg",
-            press: () {
-              // Navigator.of(context).pushReplacement(CupertinoPageRoute(builder: (context) => MultiProvider(
-              //   providers: [
-              //     ChangeNotifierProvider(
-              //       create: (context) => MenuController(),
-              //     ),
-              //   ],
-              //   child: DefaultScreen(),
-              // ),));
 
-              Navigator.pushReplacement(context, PageRouteBuilder(pageBuilder: (context, animation, secondaryAnimation) => MultiProvider(
-                    providers: [
-                      ChangeNotifierProvider(
-                        create: (context) => MenuController(),
-                      ),
-                    ],
-                    child: DefaultScreen(),
-                  ),transitionDuration: Duration.zero, reverseTransitionDuration: Duration.zero,),);
-
-            },
-          ),
           DrawerListTile(
             title: "Settings",
             svgSrc: "assets/icons/menu_setting.svg",
@@ -104,6 +131,30 @@ class SideMenu extends StatelessWidget {
 
             },
           ),
+
+          level == 1 ? DrawerListTile(
+            title: "Manage Subdivision",
+            svgSrc: "assets/icons/menu_setting.svg",
+            press: () {
+
+            },
+          ) : Container(),
+
+          level == 2 ? DrawerListTile(
+            title: "Manage District",
+            svgSrc: "assets/icons/menu_setting.svg",
+            press: () {
+
+            },
+          ) : Container(),
+
+          level == 3 ? DrawerListTile(
+            title: "Manage State",
+            svgSrc: "assets/icons/menu_setting.svg",
+            press: () {
+
+            },
+          ) : Container(),
           DrawerListTile(
             title: "Logout",
             svgSrc: "assets/icons/menu_setting.svg",

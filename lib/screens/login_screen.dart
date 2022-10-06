@@ -1,3 +1,4 @@
+import 'package:admin/screens/DefaultScreen.dart';
 import 'package:admin/screens/dashboard_screen.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/cupertino.dart';
@@ -264,7 +265,16 @@ class _LoginScreenState extends State<LoginScreen> {
               Navigator.pushReplacement(
                   context,
                   CupertinoPageRoute(
-                      builder: (ctx) =>  DashBoardScreen1()));
+                      builder: (ctx) =>  MultiProvider(
+                        providers: [
+                          ChangeNotifierProvider(
+                            create: (context) => MenuController(),
+                          ),
+                        ],
+                        child:
+                             DefaultScreen()
+
+                      ),));
             } else {
               Navigator.of(context).pop();
               ScaffoldMessenger.of(context)

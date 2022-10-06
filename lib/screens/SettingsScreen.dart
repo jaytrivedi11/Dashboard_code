@@ -22,17 +22,41 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
 
-  var stationID;
+  var stationID="";
+  var policestationname="";
+  var name="";
+  var adress="";
+  var emailid="";
+
+
   Future<bool> getStationId() async{
     SharedPreferences prefs = await SharedPreferences.getInstance();
-     stationID = prefs.getString('stationID');
+     stationID = prefs.getString('stationID')!;
+     policestationname = prefs.getString("name")!;
+    name = prefs.getString("inspector")!;
+    adress = prefs.getString("address")!;
+    emailid = prefs.getString("email")!;
+    print(name);
+
+    setState(() {
+
+    });
 
      if(stationID!=null){
+
        return true;
+
      }else{
        return false;
      }
 
+
+  }
+  @override
+  void initState() {
+    // TODO: implement initState
+    getStationId();
+    super.initState();
   }
 
   @override
@@ -56,61 +80,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
               // It takes 5/6 part of the screen
               flex: 5,
               child: Scaffold(
-                body: Row(
-                  children: [
-                    SizedBox(width: 50,),
-                    Container(
-                      padding: EdgeInsets.all(defaultPadding),
-                      decoration: BoxDecoration(
-                        color: secondaryColor,
-                        borderRadius: const BorderRadius.all(Radius.circular(10)),
-                      ),
-                      width:size.width*0.7,
-                      height: 500,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Center(
-                            child: Text(
-                              'Gujarat Police',
-                              style: kLoginTitleStyle(size),
+                body: Center(
+                  child: Container(
+                        padding: EdgeInsets.all(defaultPadding),
+                        decoration: BoxDecoration(
+                          color: secondaryColor,
+                          borderRadius: const BorderRadius.all(Radius.circular(10)),
+                        ),
+                        width: Responsive.isDesktop(context) ? size.width * 0.7 : size.width,
+                        height: Responsive.isDesktop(context) ?  700 : size.height,
+                        child: Center(
+                          child: Responsive.isDesktop(context) ? Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: getChildren(size),
+                          ) : SingleChildScrollView(
+                            child: Column(
+                              children: getChildren(size),
                             ),
                           ),
-                          FutureBuilder(
-                            future: getStationId(),
-                            builder: (context, snapshot) {
-                              if(snapshot.hasData){
-                                  return QrImage(
-                                    data:
-                                        'https://meek-sawine-c07b78.netlify.app/#form/${stationID}',
-                                    version: QrVersions.auto,
-                                    foregroundColor: Colors.grey,
-                                    size: 320,
-                                    eyeStyle: const QrEyeStyle(
-                                      eyeShape: QrEyeShape.square,
-                                      color: Color(0xff128760),
-                                    ),
-                                    dataModuleStyle: const QrDataModuleStyle(
-                                      dataModuleShape: QrDataModuleShape.square,
-                                      color: Color(0xff1a5441),
-                                    ),
-
-                                  );
-                                }else{
-                                return Container();
-                              }
-                              }
-                          ),
-                          SizedBox(height: 20,),
-                          Center(
-                            child: ElevatedButton(
-                                    onPressed: generateQR, child: Text("Download")),
-                          ),
-                        ],
+                        )
                       ),
-                    )
-                  ],
-                ),
+                )
                 // body: Center(
                 //     child: ElevatedButton(
                 //         onPressed: generateQR, child: Text("Generate QR"))),
@@ -130,5 +120,171 @@ class _SettingsScreenState extends State<SettingsScreen> {
     html.AnchorElement anchorElement = new html.AnchorElement(href: url);
     anchorElement.download = url;
     anchorElement.click();
+  }
+  
+  getChildren(Size size){
+    return [
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(height: 100,),
+          Text(
+
+            "Police Station name:",
+            style: TextStyle(
+                fontSize:  size.height * 0.030
+            ),
+          ),
+          Container(
+            width:
+            Responsive.isDesktop(context) ? size.width *0.3 : size.width * 0.8,
+            padding: EdgeInsets.symmetric(horizontal: 10),
+            decoration: BoxDecoration(
+              borderRadius: const BorderRadius.all(
+                Radius.circular(10),
+              ),
+              border: Border.all(
+                color: primaryColor,
+                width: 0.5,
+              ),
+            ),
+            child:
+            Text(
+
+              policestationname,
+              style: TextStyle(color: Colors.grey
+                  ,fontSize:  size.height * 0.040),
+            ),
+          ),
+          SizedBox(height: 20,),
+          Text(
+
+            "Inspector Name :",
+            style: TextStyle(
+                fontSize:  size.height * 0.030),
+          ),
+          Container(
+            width:
+            Responsive.isDesktop(context) ? size.width *0.3 : size.width * 0.8,
+            padding: EdgeInsets.symmetric(horizontal: 10),
+            decoration: BoxDecoration(
+              borderRadius: const BorderRadius.all(
+                Radius.circular(10),
+              ),
+              border: Border.all(
+                color: primaryColor,
+                width: 0.5,
+              ),
+            ),
+            child:
+            Text(
+              name,
+              style: TextStyle(color: Colors.grey
+                  ,fontSize:  size.height * 0.040),
+            ),
+          ),
+          SizedBox(height: 20,),
+          Text(
+
+            "Email",
+            style: TextStyle(
+                fontSize:  size.height * 0.030),
+          ),
+          Container(
+            width:
+            Responsive.isDesktop(context) ? size.width *0.3 : size.width * 0.8,
+            padding: EdgeInsets.symmetric(horizontal: 10),
+            decoration: BoxDecoration(
+              borderRadius: const BorderRadius.all(
+                Radius.circular(10),
+              ),
+              border: Border.all(
+                color: primaryColor,
+                width: 0.5,
+              ),
+            ),
+            child:
+            Text(
+              emailid,
+              style: TextStyle(color: Colors.grey
+                  ,fontSize:  size.height * 0.040),
+            ),
+          ),
+          SizedBox(height: 20,),
+          Text(
+
+            "Adress",
+            style: TextStyle(
+                fontSize:  size.height * 0.030),
+          ),
+          Container(
+            width:
+            Responsive.isDesktop(context) ? size.width *0.3 : size.width * 0.8,
+            padding: EdgeInsets.symmetric(horizontal: 10),
+            decoration: BoxDecoration(
+              borderRadius: const BorderRadius.all(
+                Radius.circular(10),
+              ),
+              border: Border.all(
+                color: primaryColor,
+                width: 0.5,
+              ),
+            ),
+            child:
+            Text(
+              adress,
+              style: TextStyle(color: Colors.grey
+                  ,fontSize:  size.height * 0.040),
+            ),
+          ),
+
+
+        ],
+      ),
+      SizedBox(width: 200,),
+
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+
+          SizedBox(height: 50,),
+          FutureBuilder(
+              future: getStationId(),
+              builder: (context, snapshot) {
+                if(snapshot.hasData){
+                  return QrImage(
+                    data:
+                    'https://meek-sawine-c07b78.netlify.app/#form/${stationID}',
+                    version: QrVersions.auto,
+                    foregroundColor: Colors.grey,
+                    size: 400,
+                    eyeStyle: const QrEyeStyle(
+                      eyeShape: QrEyeShape.square,
+                      color: Color(0xff128760),
+                    ),
+                    dataModuleStyle: const QrDataModuleStyle(
+                      dataModuleShape: QrDataModuleShape.square,
+                      color: Color(0xff1a5441),
+                    ),
+
+                  );
+                }else{
+                  return Container();
+                }
+              }
+          ),
+          SizedBox(height: 20,),
+          Center(
+            child: ElevatedButton(
+                onPressed: generateQR, child: Container(
+                alignment: Alignment.center,
+                height: 50,
+                width: 200,
+                child: Text("Download Qr code",style: TextStyle(fontSize: 18),))),
+          ),
+        ],
+      ),
+    ];
   }
 }

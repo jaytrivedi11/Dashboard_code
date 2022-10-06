@@ -24,68 +24,61 @@ class RecentFiles extends StatelessWidget {
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             List<dynamic> list = jsonDecode(snapshot.data.toString());
-            return Container(
-              padding: EdgeInsets.all(defaultPadding),
-              decoration: BoxDecoration(
-                color: secondaryColor,
-                borderRadius: const BorderRadius.all(Radius.circular(10)),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  DropdownButton<String>(
-                    items: <String>['A', 'B', 'C', 'D'].map((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      value="jay";
+            return Column(
+              children: [
 
-                    },
+                Container(
+                  padding: EdgeInsets.all(defaultPadding),
+                  decoration: BoxDecoration(
+                    color: secondaryColor,
+                    borderRadius: const BorderRadius.all(Radius.circular(10)),
                   ),
-                  Text(
-                    "Recent Feedback",
-                    style: Theme.of(context).textTheme.subtitle1,
-                  ),
-                  SizedBox(
-                    width: double.infinity,
-                    child: SingleChildScrollView(
-                      child: DataTable2(
-                        // columnSpacing: defaultPadding,
-                        // minWidth: 600,
-                        columnSpacing: 0,
-                        dataRowHeight: 70,
-                        columns: [
-                          DataColumn(
-                            label: Text("Sr.no"),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Recent Feedback",
+                        style: Theme.of(context).textTheme.subtitle1,
+                      ),
+                      SizedBox(
+                        width: double.infinity,
+                        child: SingleChildScrollView(
+                          child: DataTable2(
+                            // columnSpacing: defaultPadding,
+                            // minWidth: 600,
+                            columnSpacing: 0,
+                            dataRowHeight: 70,
+                            columns: [
+                              DataColumn(
+                                label: Text("Sr.no"),
+                              ),
+                              DataColumn(
+                                label: Text("Name"),
+                              ),
+                              DataColumn(
+                                label: Text("Mobile no"),
+                              ),
+                              DataColumn(
+                                label: Text("Date"),
+                              ),
+                              // DataColumn(
+                              //   label: Text("Police Station"),
+                              // ),
+                              DataColumn(
+                                label: Text("FeedBack"),
+                              ),
+                            ],
+                            rows: List.generate(
+                            10,
+                              (index) => recentFileDataRow( FeedbackModel.fromJson(list[index]),index,context),
+                            ),
                           ),
-                          DataColumn(
-                            label: Text("Name"),
-                          ),
-                          DataColumn(
-                            label: Text("Mobile no"),
-                          ),
-                          DataColumn(
-                            label: Text("Date"),
-                          ),
-                          // DataColumn(
-                          //   label: Text("Police Station"),
-                          // ),
-                          DataColumn(
-                            label: Text("FeedBack"),
-                          ),
-                        ],
-                        rows: List.generate(
-                        list.length,
-                          (index) => recentFileDataRow( FeedbackModel.fromJson(list[index]),index,context),
                         ),
                       ),
-                    ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+              ],
             );
           } else {
             return Center(
@@ -120,4 +113,7 @@ DataRow recentFileDataRow(FeedbackModel fileInfo,int position,BuildContext conte
       DataCell(Text(fileInfo.feedback!)),
     ],
   );
+
+
 }
+
