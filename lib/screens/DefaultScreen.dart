@@ -26,6 +26,7 @@ class _DefaultScreenState extends State<DefaultScreen> {
   bool isNumLoading = true;
   var id = "";
   var time = "weekly";
+  var place = "";
   var optionsQ1 = {
     "0": "Through a person known to a police officer",
     "1": "With a neighbour or local leader",
@@ -48,23 +49,26 @@ class _DefaultScreenState extends State<DefaultScreen> {
   getID() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     if (prefs.containsKey("level")) {
-      switch(prefs.getInt("level")){
+      switch (prefs.getInt("level")) {
         case 0:
           setState(() {
             isLoading = false;
             id = prefs.getString("stationID")!;
+            place = "station";
           });
           break;
         case 1:
           setState(() {
             isLoading = false;
             id = prefs.getString("subdivisionID")!;
+            place = "subdivision";
           });
           break;
         case 2:
           setState(() {
             isLoading = false;
             id = prefs.getString("districtID")!;
+            place = "district";
           });
       }
       getNumbers();
@@ -135,54 +139,176 @@ class _DefaultScreenState extends State<DefaultScreen> {
                                 const SizedBox(
                                   height: 20,
                                 ),
-                                FutureBuilder<http.Response>(
-                                  future: http.get(Uri.parse(
-                                    ApiConstants.baseUrl +
-                                        ApiConstants.chartRoute +
-                                        time +
-                                        ApiConstants.stationRoute +
-                                        id,
-                                  )),
-                                  builder: (context, snapshot) {
-                                    if (snapshot.hasData) {
-                                      List<WeeklyFrequency> frequencyData = [];
-                                      Map res = jsonDecode(snapshot.data!.body);
-                                      res.forEach(
-                                        (key, value) {
-                                          frequencyData.add(WeeklyFrequency(
-                                              date: key, count: value));
-                                        },
-                                      );
+                                place == "station"
+                                    ? FutureBuilder<http.Response>(
+                                        future: http.get(Uri.parse(
+                                          ApiConstants.baseUrl +
+                                              ApiConstants.chartRoute +
+                                              time +
+                                              ApiConstants.stationRoute +
+                                              id,
+                                        )),
+                                        builder: (context, snapshot) {
+                                          if (snapshot.hasData) {
+                                            List<WeeklyFrequency>
+                                                frequencyData = [];
+                                            Map res =
+                                                jsonDecode(snapshot.data!.body);
+                                            res.forEach(
+                                              (key, value) {
+                                                frequencyData.add(
+                                                    WeeklyFrequency(
+                                                        date: key,
+                                                        count: value));
+                                              },
+                                            );
 
-                                      return Container(
-                                        height: size.height * 0.5,
-                                        child: SafeArea(
-                                          child: SfCartesianChart(
-                                            primaryXAxis: CategoryAxis(),
-                                            primaryYAxis:
-                                                NumericAxis(interval: 1),
-                                            series: [
-                                              LineSeries<WeeklyFrequency,
-                                                  String>(
-                                                dataSource: frequencyData,
-                                                xValueMapper: (datum, index) =>
-                                                    datum.date,
-                                                yValueMapper: (datum, index) =>
-                                                    datum.count,
+                                            return Container(
+                                              height: size.height * 0.5,
+                                              child: SafeArea(
+                                                child: SfCartesianChart(
+                                                  primaryXAxis: CategoryAxis(),
+                                                  primaryYAxis:
+                                                      NumericAxis(interval: 1),
+                                                  series: [
+                                                    LineSeries<WeeklyFrequency,
+                                                        String>(
+                                                      dataSource: frequencyData,
+                                                      xValueMapper:
+                                                          (datum, index) =>
+                                                              datum.date,
+                                                      yValueMapper:
+                                                          (datum, index) =>
+                                                              datum.count,
+                                                    ),
+                                                  ],
+                                                ),
                                               ),
-                                            ],
-                                          ),
-                                        ),
-                                      );
-                                    } else {
-                                      return const Center(
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 1,
-                                        ),
-                                      );
-                                    }
-                                  },
-                                ),
+                                            );
+                                          } else {
+                                            return const Center(
+                                              child: CircularProgressIndicator(
+                                                strokeWidth: 1,
+                                              ),
+                                            );
+                                          }
+                                        },
+                                      )
+                                    : place == "subdivision"
+                                        ? FutureBuilder<http.Response>(
+                                            future: http.get(Uri.parse(
+                                              ApiConstants.baseUrl +
+                                                  ApiConstants.chartRoute +
+                                                  time +
+                                                  ApiConstants
+                                                      .frequencyForStation +
+                                                  id,
+                                            )),
+                                            builder: (context, snapshot) {
+                                              if (snapshot.hasData) {
+                                                // List<WeeklyFrequency>
+                                                //     frequencyData = [];
+                                                // Map res = jsonDecode(
+                                                //     snapshot.data!.body);
+                                                // res.forEach(
+                                                //   (key, value) {
+                                                //     frequencyData.add(
+                                                //         WeeklyFrequency(
+                                                //             date: key,
+                                                //             count: value));
+                                                //   },
+                                                // );
+
+                                                List<List<MultiFrequency>>
+                                                    frequencyData = [];
+
+                                                List res = jsonDecode(
+                                                    snapshot.data!.body);
+
+                                                for (var i = 0;
+                                                    i < res.length;
+                                                    i++) {
+                                                  Map data = res[i]["data"];
+                                                  String name = res[i]["name"];
+                                                  List<MultiFrequency> temp =
+                                                      [];
+                                                  data.forEach((key, value) {
+                                                    temp.add(MultiFrequency(
+                                                        date: key,
+                                                        count: value,
+                                                        name: name));
+                                                  });
+                                                  frequencyData.add(temp);
+                                                }
+
+                                                print(snapshot.data!.body);
+
+                                                return Container(
+                                                  height: size.height * 0.5,
+                                                  child: SafeArea(
+                                                    child: SfCartesianChart(
+                                                      primaryXAxis:
+                                                          CategoryAxis(
+                                                        labelStyle:
+                                                            Theme.of(context)
+                                                                .textTheme
+                                                                .bodyText1,
+                                                      ),
+                                                      primaryYAxis: NumericAxis(
+                                                          labelStyle:
+                                                              Theme.of(context)
+                                                                  .textTheme
+                                                                  .bodyText1,
+                                                          interval: 1),
+                                                      series: List.generate(
+                                                          frequencyData.length,
+                                                          (index) {
+                                                        return LineSeries<
+                                                            MultiFrequency,
+                                                            String>(
+                                                          name: frequencyData[
+                                                                  index]
+                                                              .first
+                                                              .name,
+                                                          dataSource:
+                                                              frequencyData[
+                                                                  index],
+                                                          xValueMapper:
+                                                              (datum, index) =>
+                                                                  datum.date,
+                                                          yValueMapper:
+                                                              (datum, index) =>
+                                                                  datum.count,
+                                                          dataLabelMapper:
+                                                              (datum, index) =>
+                                                                  datum.count
+                                                                      .toString(),
+                                                        );
+                                                      }),
+                                                      legend: Legend(
+                                                        isVisible: true,
+                                                        textStyle:
+                                                            Theme.of(context)
+                                                                .textTheme
+                                                                .bodyText1,
+                                                      ),
+                                                      tooltipBehavior:
+                                                          TooltipBehavior(
+                                                              enable: true),
+                                                    ),
+                                                  ),
+                                                );
+                                              } else {
+                                                return const Center(
+                                                  child:
+                                                      CircularProgressIndicator(
+                                                    strokeWidth: 1,
+                                                  ),
+                                                );
+                                              }
+                                            },
+                                          )
+                                        : Container(),
                               ],
                             ),
                           ),
@@ -191,20 +317,125 @@ class _DefaultScreenState extends State<DefaultScreen> {
 
                       // Other Charts
 
-                      Container(
-                        margin:
-                            EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                        height: Responsive.isDesktop(context)
-                            ? size.height * 0.65
-                            : size.height * 1.6,
-                        child: Responsive.isDesktop(context)
-                            ? Row(children: getOtherData(size))
-                            : Column(children: getOtherData(size)),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(18.0),
-                        child: RecentFiles(),
-                      )
+                      place == "station"
+                          ? Container(
+                              margin: EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 10),
+                              height: Responsive.isDesktop(context)
+                                  ? size.height * 0.65
+                                  : size.height * 1.6,
+                              child: Responsive.isDesktop(context)
+                                  ? Row(children: getOtherData(size))
+                                  : Column(children: getOtherData(size)),
+                            )
+                          : Container(),
+                      place == "station"
+                          ? Padding(
+                              padding: const EdgeInsets.all(18.0),
+                              child: RecentFiles(),
+                            )
+                          : Container(),
+                      place == "subdivision"
+                          ? Container(
+                              margin: EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 10),
+                              // height: Responsive.isDesktop(context)
+                              //     ? size.height * 0.65
+                              //     : size.height * 1.6,
+                              child: Card(
+                                color: secondaryColor,
+                                child: Center(
+                                  child: FutureBuilder<http.Response>(
+                                    future: http.get(Uri.parse(
+                                      ApiConstants.baseUrl +
+                                          ApiConstants.chartRoute +
+                                          "average/stations/" +
+                                          id,
+                                    )),
+                                    builder: (context, snapshot) {
+                                      if (snapshot.hasData) {
+                                        List<AverageFrequency> frequencyData =
+                                            [];
+                                        List res =
+                                            jsonDecode(snapshot.data!.body);
+
+                                        res.forEach((element) {
+                                          frequencyData.add(AverageFrequency(
+                                            name: element[0],
+                                            count: double.parse(element[1]
+                                                .toString()
+                                                .substring(0, 1)),
+                                          ));
+                                        });
+
+                                        return Container(
+                                          padding: EdgeInsets.all(25),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              SizedBox(
+                                                height: 10,
+                                              ),
+                                              Text("Average stars per station",
+                                                  style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 20)),
+                                              SizedBox(
+                                                height: 10,
+                                              ),
+                                              SafeArea(
+                                                child: SfCartesianChart(
+                                                  primaryXAxis: CategoryAxis(
+                                                    isInversed: true,
+                                                    labelStyle:
+                                                        Theme.of(context)
+                                                            .textTheme
+                                                            .bodyText1,
+                                                  ),
+                                                  primaryYAxis: NumericAxis(
+                                                    interval: 1,
+                                                    maximum: 5,
+                                                    minimum: 0,
+                                                    opposedPosition: true,
+                                                    labelStyle:
+                                                        Theme.of(context)
+                                                            .textTheme
+                                                            .bodyText1,
+                                                  ),
+                                                  series: [
+                                                    BarSeries<AverageFrequency,
+                                                        String>(
+                                                      dataSource: frequencyData,
+                                                      xValueMapper:
+                                                          (datum, index) =>
+                                                              datum.name,
+                                                      yValueMapper:
+                                                          (datum, index) =>
+                                                              datum.count,
+                                                      dataLabelMapper:
+                                                          (datum, index) =>
+                                                              datum.count
+                                                                  .toString(),
+                                                      dataLabelSettings:
+                                                          DataLabelSettings(
+                                                              isVisible: true),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      } else {
+                                        return CircularProgressIndicator();
+                                      }
+                                    },
+                                  ),
+                                ),
+                              ),
+                            )
+                          : Container(),
                     ],
                   ),
                 ),
@@ -244,13 +475,29 @@ class _DefaultScreenState extends State<DefaultScreen> {
                   child: Center(
                     child: FutureBuilder<http.Response>(
                       future: http.get(
-                        Uri.parse(
-                          ApiConstants.baseUrl +
-                              ApiConstants.chartRoute +
-                              time +
-                              ApiConstants.totalFeedback +
-                              id,
-                        ),
+                        place == "station"
+                            ? Uri.parse(
+                                ApiConstants.baseUrl +
+                                    ApiConstants.chartRoute +
+                                    time +
+                                    ApiConstants.totalFeedbackStation +
+                                    id,
+                              )
+                            : place == "subdivision"
+                                ? Uri.parse(
+                                    ApiConstants.baseUrl +
+                                        ApiConstants.chartRoute +
+                                        time +
+                                        ApiConstants.totalFeedbackSubdivision +
+                                        id,
+                                  )
+                                : Uri.parse(
+                                    ApiConstants.baseUrl +
+                                        ApiConstants.chartRoute +
+                                        time +
+                                        ApiConstants.totalFeedbackDistrict +
+                                        id,
+                                  ),
                       ),
                       builder: (context, snapshot) {
                         if (snapshot.hasData) {
@@ -312,12 +559,26 @@ class _DefaultScreenState extends State<DefaultScreen> {
             child: Center(
               child: FutureBuilder<http.Response>(
                 future: http.get(
-                  Uri.parse(
-                    ApiConstants.baseUrl +
-                        ApiConstants.chartRoute +
-                        ApiConstants.averageForStation +
-                        id,
-                  ),
+                  place == "station"
+                      ? Uri.parse(
+                          ApiConstants.baseUrl +
+                              ApiConstants.chartRoute +
+                              ApiConstants.averageForStation +
+                              id,
+                        )
+                      : place == "subdivision"
+                          ? Uri.parse(
+                              ApiConstants.baseUrl +
+                                  ApiConstants.chartRoute +
+                                  ApiConstants.averageForSubdivision +
+                                  id,
+                            )
+                          : Uri.parse(
+                              ApiConstants.baseUrl +
+                                  ApiConstants.chartRoute +
+                                  ApiConstants.averageForDistrict +
+                                  id,
+                            ),
                 ),
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
@@ -381,6 +642,10 @@ class _DefaultScreenState extends State<DefaultScreen> {
                             yValueMapper: (datum, index) => datum.count,
                           ),
                         ],
+                        tooltipBehavior: TooltipBehavior(
+                          enable: true,
+                          format: 'point.x : point.y',
+                        ),
                         title: ChartTitle(
                           text: 'How did people got here ?',
                           textStyle: Theme.of(context).textTheme.bodyLarge,
@@ -446,6 +711,10 @@ class _DefaultScreenState extends State<DefaultScreen> {
                             yValueMapper: (datum, index) => datum.count,
                           ),
                         ],
+                        tooltipBehavior: TooltipBehavior(
+                          enable: true,
+                          format: 'point.x : point.y',
+                        ),
                         title: ChartTitle(
                           text:
                               'After how much time \nthe people were able to get the service?',
@@ -525,4 +794,19 @@ class WeeklyFrequency {
   final int count;
 
   WeeklyFrequency({required this.date, required this.count});
+}
+
+class MultiFrequency {
+  final String date;
+  final int count;
+  final String name;
+
+  MultiFrequency({required this.date, required this.count, required this.name});
+}
+
+class AverageFrequency {
+  final String name;
+  final double count;
+
+  AverageFrequency({required this.name, required this.count});
 }

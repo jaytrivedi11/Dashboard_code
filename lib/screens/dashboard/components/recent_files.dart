@@ -26,7 +26,6 @@ class RecentFiles extends StatelessWidget {
             List<dynamic> list = jsonDecode(snapshot.data.toString());
             return Column(
               children: [
-
                 Container(
                   padding: EdgeInsets.all(defaultPadding),
                   decoration: BoxDecoration(
@@ -69,8 +68,11 @@ class RecentFiles extends StatelessWidget {
                               ),
                             ],
                             rows: List.generate(
-                            10,
-                              (index) => recentFileDataRow( FeedbackModel.fromJson(list[index]),index,context),
+                              10,
+                              (index) => recentFileDataRow(
+                                  FeedbackModel.fromJson(list[index]),
+                                  index,
+                                  context),
                             ),
                           ),
                         ),
@@ -91,17 +93,35 @@ class RecentFiles extends StatelessWidget {
   }
 }
 
-DataRow recentFileDataRow(FeedbackModel fileInfo,int position,BuildContext context) {
+DataRow recentFileDataRow(
+    FeedbackModel fileInfo, int position, BuildContext context) {
   return DataRow2(
-    onTap: (){
-      Navigator.push(context, PageRouteBuilder(pageBuilder: (context, animation, secondaryAnimation) => MultiProvider(
-        providers: [
-          ChangeNotifierProvider(
-            create: (context) => MenuController(),
-          ),
-        ],
-        child: FeedbackInfo(feedbackId: fileInfo.sId,),
-      ),transitionDuration: Duration.zero, reverseTransitionDuration: Duration.zero,),);
+    onTap: () {
+      // Navigator.push(context, PageRouteBuilder(pageBuilder: (context, animation, secondaryAnimation) => MultiProvider(
+      //   providers: [
+      //     ChangeNotifierProvider(
+      //       create: (context) => MenuController(),
+      //     ),
+      //   ],
+      //   child: FeedbackInfo(feedbackId: fileInfo.sId,),
+      // ),transitionDuration: Duration.zero, reverseTransitionDuration: Duration.zero,),);
+
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return Card(
+              child: MultiProvider(
+                providers: [
+                  ChangeNotifierProvider(
+                    create: (context) => MenuController(),
+                  ),
+                ],
+                child: FeedbackInfo(
+                  feedbackId: fileInfo.sId,
+                ),
+              ),
+            );
+          });
     },
     cells: [
       DataCell(Text("${position + 1}")),
@@ -113,7 +133,4 @@ DataRow recentFileDataRow(FeedbackModel fileInfo,int position,BuildContext conte
       DataCell(Text(fileInfo.feedback!)),
     ],
   );
-
-
 }
-
