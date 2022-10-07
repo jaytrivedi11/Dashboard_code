@@ -68,11 +68,8 @@ class RecentFiles extends StatelessWidget {
                               ),
                             ],
                             rows: List.generate(
-                              10,
-                              (index) => recentFileDataRow(
-                                  FeedbackModel.fromJson(list[index]),
-                                  index,
-                                  context),
+                            list.length,
+                              (index) => recentFileDataRow( FeedbackModel.fromJson(list[index]),index,context),
                             ),
                           ),
                         ),

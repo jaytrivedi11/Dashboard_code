@@ -3,16 +3,22 @@ import 'dart:convert';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../constants.dart';
+import '../controllers/MenuController.dart';
 import '../models/PoliceStationList.dart';
 import '../models/feedback.dart';
+import '../network/ApiConstant.dart';
+import 'package:http/http.dart' as http;
+import 'dart:html' as html;
 import '../network/ApiService.dart';
 import '../responsive.dart';
 import 'dashboard/components/header.dart';
 import 'dashboard/components/recent_files.dart';
 import 'dashboard/components/storage_details.dart';
+import 'main/components/side_menu.dart';
 
 class SubDevisionFeddback extends StatefulWidget {
   const SubDevisionFeddback({Key? key}) : super(key: key);
@@ -28,23 +34,37 @@ class _SubDevisionFeddbackState extends State<SubDevisionFeddback> {
   @override
   void initState() {
     // TODO: implement initState
-    getLevel();
+    // getLevel();
     super.initState();
   }
   List<dynamic> list = [];
-  String? time;
-  getLevel() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    if(prefs.containsKey("level")){
-      level = prefs.getInt("level")!;
-      var data = ApiService().getPoliceStationList();
-      list = jsonDecode(await data);
-      time=PoliceStationList.fromJson(list[0]).name;
-      setState(() {
+  String? stationId = "";
+  // getLevel() async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   if(prefs.containsKey("level")){
+  //     level = prefs.getInt("level")!;
+  //     var data = ApiService().getPoliceStationList();
+  //     list = jsonDecode(await data);
+  //     // time=PoliceStationList.fromJson(list[0]).sId;
+  //     setState(() {
+  //
+  //     });
+  //   }
+  //
+  // }
+  List<dynamic> list1 = [];
 
-      });
-    }
-  }
+  // Future<String> getStationId() async{
+  //    data = ApiService().getFeedbackByDevision(time.toString());
+  //   list1 = jsonDecode(data);
+  //   print("list : ${list1}");
+  //   setState(() {
+  //
+  //   });
+  //
+  //   return data;
+  //
+  // }
 
 
   @override
@@ -52,134 +72,224 @@ class _SubDevisionFeddbackState extends State<SubDevisionFeddback> {
     Size size = MediaQuery.of(context).size;
 
 
-    return SafeArea(
-      child: Column(
-        children: [
-          SingleChildScrollView(
-            primary: false,
-            padding: EdgeInsets.all(defaultPadding),
-            child: Column(
-              children: [
-                Header(),
-                SizedBox(height: defaultPadding),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      flex: 5,
-                      child: Column(
-                        children: [
-                          // MyFiles(),
-                          SizedBox(height: defaultPadding),
-                          FutureBuilder(
-                              future: ApiService().getFeedbackByPolicestation(),
-                              builder: (context, snapshot) {
-                                if (snapshot.hasData) {
-                                  List<dynamic> list = jsonDecode(snapshot.data.toString());
-                                  return Column(
+    return Scaffold(
+      key: context.read<MenuController>().scaffoldKey,
+      drawer: SideMenu(),
+      body: SafeArea(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+
+            if (Responsive.isDesktop(context))
+              Expanded(
+                // default flex = 1
+                // and it takes 1/6 part of the screen
+                child: SideMenu(),
+              ),
+            Expanded(
+              flex: 5,
+              child: Scaffold(
+                body: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      SingleChildScrollView(
+                        primary: false,
+                        padding: EdgeInsets.all(defaultPadding),
+                        child: Column(
+                          children: [
+                            Header(),
+                            SizedBox(height: defaultPadding),
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  flex: 5,
+                                  child: Column(
                                     children: [
-                                      const SizedBox(
-                                        // height: 50,
-                                      ),
-                                      Responsive.isDesktop(context)
-                                          ? Row(
-                                          children: getDropdown(size)
-
-
-
-                                      )
-                                          : Column(
-                                        children: getDropdown(size),
-                                      ),
-                                      const SizedBox(
-                                        height: 20,
-                                      ),
-                                      Container(
-                                        padding: EdgeInsets.all(defaultPadding),
-                                        decoration: BoxDecoration(
-                                          color: secondaryColor,
-                                          borderRadius: const BorderRadius.all(Radius.circular(10)),
-                                        ),
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              "Recent Feedback",
-                                              style: Theme.of(context).textTheme.subtitle1,
-                                            ),
-                                            SizedBox(
-                                              width: double.infinity,
-                                              child: SingleChildScrollView(
-                                                child: DataTable2(
-                                                  // columnSpacing: defaultPadding,
-                                                  // minWidth: 600,
-                                                  columnSpacing: 0,
-                                                  dataRowHeight: 70,
-                                                  columns: [
-                                                    DataColumn(
-                                                      label: Text("Sr.no"),
-                                                    ),
-                                                    DataColumn(
-                                                      label: Text("Name"),
-                                                    ),
-                                                    DataColumn(
-                                                      label: Text("Mobile no"),
-                                                    ),
-                                                    DataColumn(
-                                                      label: Text("Date"),
-                                                    ),
-                                                    // DataColumn(
-                                                    //   label: Text("Police Station"),
-                                                    // ),
-                                                    DataColumn(
-                                                      label: Text("FeedBack"),
-                                                    ),
-                                                  ],
-                                                  rows: List.generate(
-                                                    list.length,
-                                                        (index) => recentFileDataRow( FeedbackModel.fromJson(list[index]),index,context),
-                                                  ),
-                                                ),
+                                      Row(
+                                        children: [
+                                          Text("       Setect PoliceStation     ",
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 20,
+                                              )),
+                                          Container(
+                                            width:
+                                            Responsive.isDesktop(context) ? size.width * 0.2 : size.width * 0.8,
+                                            padding: EdgeInsets.symmetric(horizontal: 10),
+                                            decoration: BoxDecoration(
+                                              borderRadius: const BorderRadius.all(
+                                                Radius.circular(10),
+                                              ),
+                                              border: Border.all(
+                                                color: primaryColor,
+                                                width: 0.5,
                                               ),
                                             ),
-                                          ],
-                                        ),
+                                            child: FutureBuilder(
+                                              future: ApiService().getPoliceStationList(),
+                                              builder: (context, snapshot) {
+                                                if(snapshot.hasData){
+                                                  List response = jsonDecode(snapshot.data.toString());
+                                                  if(stationId == ""){
+                                                    stationId = response[0]["_id"];
+                                                  }
+                                                  return DropdownButton(
+                                                    items: response.map((e) => DropdownMenuItem(child: Text(e["name"]), value: e["_id"],)).toList(),
+                                                    value: stationId,
+                                                    isExpanded: true,
+                                                    onChanged: (value) {
+                                                      setState(() {
+                                                        stationId = value.toString();
+                                                      });
+                                                    }
+                                                  );
+                                                } else {
+                                                  return Container();
+                                                }
+                                              },
+                                            ),
+                                          ),
+
+                                          SizedBox(width: size.width/3,height: 50,),
+
+                                          ElevatedButton(
+                                              onPressed: (){
+
+                                                if(stationId!=""){
+                                                  generateExecel();
+                                                }
+
+                                              }, child: Container(
+                                              alignment: Alignment.center,
+                                              height: 40,
+                                              width: 150,
+                                              child: Text("Generate Excel File",style: TextStyle(fontSize: 15),))),
+                                        ],
                                       ),
+                                      SizedBox(height: defaultPadding),
+                                      SingleChildScrollView(
+                                        child: Column(
+                                                  children: [
+
+                                                    Container(
+                                                      padding: EdgeInsets.all(defaultPadding),
+                                                      decoration: BoxDecoration(
+                                                        color: secondaryColor,
+                                                        borderRadius: const BorderRadius.all(Radius.circular(10)),
+                                                      ),
+                                                      child: Column(
+                                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                                        children: [
+                                                          Text(
+                                                            "Recent Feedback",
+                                                            style: Theme.of(context).textTheme.subtitle1,
+                                                          ),
+                                                          SizedBox(
+                                                            width: double.infinity,
+                                                            child: SingleChildScrollView(
+                                                              child: stationId != "" ? FutureBuilder<List>(
+                                                                future: ApiService().getFeedbackUsingID(stationId!),
+                                                                builder:(context, snapshot) {
+                                                                  if (snapshot
+                                                                      .hasData) {
+                                                                    return DataTable2(
+                                                                      // columnSpacing: defaultPadding,
+                                                                      // minWidth: 600,
+                                                                      columnSpacing: 0,
+                                                                      dataRowHeight: 70,
+                                                                      columns: [
+                                                                        DataColumn(
+                                                                          label: Text(
+                                                                              "Sr.no"),
+                                                                        ),
+                                                                        DataColumn(
+                                                                          label: Text(
+                                                                              "Name"),
+                                                                        ),
+                                                                        DataColumn(
+                                                                          label: Text(
+                                                                              "Mobile no"),
+                                                                        ),
+                                                                        DataColumn(
+                                                                          label: Text(
+                                                                              "Date"),
+                                                                        ),
+                                                                        // DataColumn(
+                                                                        //   label: Text("Police Station"),
+                                                                        // ),
+                                                                        DataColumn(
+                                                                          label: Text(
+                                                                              "FeedBack"),
+                                                                        ),
+                                                                      ],
+                                                                      rows: List
+                                                                          .generate(
+                                                                        snapshot.data!.length,
+                                                                            (
+                                                                            index) =>
+                                                                            recentFileDataRow(
+                                                                                FeedbackModel
+                                                                                    .fromJson(
+                                                                                    snapshot.data![index]),
+                                                                                index,
+                                                                                context),
+                                                                      ),
+                                                                    );
+                                                                  } else {
+                                                                    return Container();
+                                                                  }
+                                                                }
+                                                              ): Container(),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                      ),
+
+                                      if (Responsive.isMobile(context))
+                                        SizedBox(height: defaultPadding),
+                                      if (Responsive.isMobile(context)) StarageDetails(),
                                     ],
-                                  );
-                                } else {
-                                  return Center(
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 1,
-                                    ),
-                                  );
-                                }
-                              }),
-                          if (Responsive.isMobile(context))
-                            SizedBox(height: defaultPadding),
-                          if (Responsive.isMobile(context)) StarageDetails(),
-                        ],
-                      ),
-                    ),
+                                  ),
+                                ),
 
-                    if (!Responsive.isMobile(context))
-                      SizedBox(width: defaultPadding),
-                    // On Mobile means if the screen is less than 850 we dont want to show it
-                    //  if (!Responsive.isMobile(context))
-                    //    Expanded(
-                    //      flex: 2,
-                    //      child: StarageDetails(),
-                    //    ),
-                  ],
-                )
-              ],
+                                if (!Responsive.isMobile(context))
+                                  SizedBox(width: defaultPadding),
+                                // On Mobile means if the screen is less than 850 we dont want to show it
+                                //  if (!Responsive.isMobile(context))
+                                //    Expanded(
+                                //      flex: 2,
+                                //      child: StarageDetails(),
+                                //    ),
+                              ],
+                            )
+                          ],
+                        ),
+                      )
+
+                    ],
+                  ),
+                ),
+              ),
             ),
-          )
-
-        ],
+          ],
+        ),
       ),
     );
 
+  }
+  void generateExecel() async {
+
+
+    var url = ApiConstants.baseUrl + ApiConstants.generateExcel + stationId!;
+
+    html.AnchorElement anchorElement = new html.AnchorElement(href: url);
+    anchorElement.download = url;
+    anchorElement.click();
   }
   getDropdown(Size size) {
     DateTime? datel;
@@ -207,23 +317,23 @@ class _SubDevisionFeddbackState extends State<SubDevisionFeddback> {
         ),
         child: Column(
           children: [
-            DropdownButton(
-              items: List.generate(list.length, (index) =>DropdownMenuItem(value: "${FeedbackModel.fromJson(list[index]).name}", child: Text("${FeedbackModel.fromJson(list[index]).name}")), ),
-              // items:
-
-              alignment: Alignment.center,
-              isExpanded: true,
-              value: time,
-              underline: Container(),
-              onChanged: ( value) {
-                time = value.toString();
-
-                setState(() {
-
-                  print(time);
-                });
-              },
-            ),
+            // DropdownButton(
+            //   items: List.generate(list.length, (index) =>DropdownMenuItem(value: "${FeedbackModel.fromJson(list[index]).name}", child: Text("${FeedbackModel.fromJson(list[index]).name}")), ),
+            //   // items:
+            //
+            //   alignment: Alignment.center,
+            //   isExpanded: true,
+            //   value: time,
+            //   underline: Container(),
+            //   onChanged: ( value) {
+            //     time = value.toString();
+            //
+            //     setState(() {
+            //
+            //       print(time);
+            //     });
+            //   },
+            // ),
 
 
           ],

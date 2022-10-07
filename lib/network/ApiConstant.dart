@@ -15,4 +15,6 @@ class ApiConstants {
   static String averageForDistrict = 'average/district/';
   static String frequencyForStation = '/frequency/stations/';
   static String staton = '/list/stations/';
+  static String generateExcel = '/station/generateExcel/';
+
 }
