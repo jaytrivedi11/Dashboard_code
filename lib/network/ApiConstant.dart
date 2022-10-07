@@ -10,4 +10,6 @@ class ApiConstants {
   static String totalFeedback = '/total/station/';
   static String averageForStation = 'average/station/';
   static String staton = '/list/stations/';
+  static String generateExcel = '/station/generateExcel/';
+
 }

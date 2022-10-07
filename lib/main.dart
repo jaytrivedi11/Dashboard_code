@@ -1,6 +1,7 @@
 import 'package:admin/constants.dart';
 import 'package:admin/controllers/MenuController.dart';
 import 'package:admin/screens/DefaultScreen.dart';
+import 'package:admin/screens/MangeSubDevision.dart';
 import 'package:admin/screens/dashboard_screen.dart';
 import 'package:admin/screens/login_screen.dart';
 import 'package:admin/screens/main/main_screen.dart';
@@ -40,8 +41,8 @@ class MyApp extends StatelessWidget {
           ),
         ],
         child: isLogged
-            ? DefaultScreen()
-            // ? DashBoardScreen1()
+            // ? DefaultScreen()
+            ? MangeSubDevision()
             : LoginScreen(),
       ),
     );

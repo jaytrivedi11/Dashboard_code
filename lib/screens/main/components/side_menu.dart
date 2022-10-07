@@ -9,7 +9,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../controllers/MenuController.dart';
 import '../../AllFeedback.dart';
 import '../../DefaultScreen.dart';
+import '../../MangeSubDevision.dart';
 import '../../SettingsScreen.dart';
+import '../../SubdevisionFeddback.dart';
 
 class SideMenu extends StatefulWidget {
   const SideMenu({
@@ -73,7 +75,7 @@ class _SideMenuState extends State<SideMenu> {
 
             },
           ),
-          DrawerListTile(
+          level==0?DrawerListTile(
             title: "Feedbacks",
             svgSrc: "assets/icons/menu_dashbord.svg",
             press: () {
@@ -88,7 +90,7 @@ class _SideMenuState extends State<SideMenu> {
 
 
             },
-          ),
+          ):Container(),
           // DrawerListTile(
           //   title: "Transaction",
           //   svgSrc: "assets/icons/menu_tran.svg",
@@ -136,6 +138,34 @@ class _SideMenuState extends State<SideMenu> {
             title: "Manage Subdivision",
             svgSrc: "assets/icons/menu_setting.svg",
             press: () {
+
+              Navigator.pushReplacement(context, PageRouteBuilder(pageBuilder: (context, animation, secondaryAnimation) => MultiProvider(
+                providers: [
+                  ChangeNotifierProvider(
+                    create: (context) => MenuController(),
+                  ),
+                ],
+                child: MangeSubDevision()
+              ),transitionDuration: Duration.zero, reverseTransitionDuration: Duration.zero,),);
+
+
+            },
+          ) : Container(),
+
+          level == 1 ? DrawerListTile(
+            title: "Feedback",
+            svgSrc: "assets/icons/menu_setting.svg",
+            press: () {
+
+              Navigator.pushReplacement(context, PageRouteBuilder(pageBuilder: (context, animation, secondaryAnimation) => MultiProvider(
+                  providers: [
+                    ChangeNotifierProvider(
+                      create: (context) => MenuController(),
+                    ),
+                  ],
+                  child: SubDevisionFeddback()
+              ),transitionDuration: Duration.zero, reverseTransitionDuration: Duration.zero,),);
+
 
             },
           ) : Container(),
