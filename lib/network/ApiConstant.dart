@@ -9,4 +9,5 @@ class ApiConstants {
   static String stationRoute = '/station/';
   static String totalFeedback = '/total/station/';
   static String averageForStation = 'average/station/';
+  static String staton = '/list/stations/';
 }

@@ -5,6 +5,7 @@ import 'package:admin/responsive.dart';
 import 'package:admin/screens/dashboard/components/my_fields.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../constants.dart';
 import '../../models/feedback.dart';
@@ -21,15 +22,35 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
+  int level = 0;
+
+
   @override
   void initState() {
-    // ApiService().getStationDetails();
+    // TODO: implement initState
+    getLevel();
     super.initState();
   }
+  List<dynamic> list = [];
+  String? time;
+  getLevel() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    if(prefs.containsKey("level")){
+      level = prefs.getInt("level")!;
+      var data = ApiService().getFeedbackByPolicestation();
+      list = jsonDecode(await data);
+     time=FeedbackModel.fromJson(list[0]).name;
+      setState(() {
+
+      });
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
+
 
     return SafeArea(
       child: FutureBuilder(
@@ -62,16 +83,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                         const SizedBox(
                                           // height: 50,
                                         ),
-                                        Responsive.isDesktop(context)
-                                            ? Row(
-                                            children: getDropdown(size)
 
-
-
-                                        )
-                                            : Column(
-                                          children: getDropdown(size),
-                                        ),
                                         const SizedBox(
                                           height: 20,
                                         ),
@@ -142,6 +154,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           ],
                         ),
                       ),
+
+
                       if (!Responsive.isMobile(context))
                         SizedBox(width: defaultPadding),
                       // On Mobile means if the screen is less than 850 we dont want to show it
@@ -165,59 +179,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
         },
       ),
     );
+
   }
   getDropdown(Size size) {
     DateTime? datel;
+
     return [
-      Text("       Select the Dates     ",
+      Text("       Setect PoliceStation     ",
           style: TextStyle(
             color: Colors.white,
             fontSize: 20,
           )),
-      Container(
-        width:
-        Responsive.isDesktop(context) ? size.width * 0.1 : size.width * 0.8,
-        padding: EdgeInsets.symmetric(horizontal: 10),
-        decoration: BoxDecoration(
-          borderRadius: const BorderRadius.all(
-            Radius.circular(10),
-          ),
-          border: Border.all(
-            color: primaryColor,
-            width: 0.5,
-          ),
-        ),
-        child: Column(
-          children: [
-            DropdownButton<DateTime>(
-              items: [
-                'Choose A Date'
-              ].map((e) => DropdownMenuItem<DateTime>(child: Text(e))).toList(),
-              alignment: Alignment.center,
-              isExpanded: true,
-              value: datel,
-              underline: Container(),
-              onChanged: ( value) {
-                showDatePicker(context: context, initialDate: DateTime.now(), firstDate: DateTime(2001), lastDate: DateTime(2099)
-                ).then((date) {
-
-                  setState(() {
-                    datel=date;
-
-                  });
-                });
-                // time = value.toString();
-                // setState(() {});
-              },
-            ),
 
 
-          ],
-        ),
-      ),
-      SizedBox(width: 10,),
-
-      Container(
+      level==1?Container(
         width:
         Responsive.isDesktop(context) ? size.width * 0.1 : size.width * 0.8,
         padding: EdgeInsets.symmetric(horizontal: 10),
@@ -233,23 +208,27 @@ class _DashboardScreenState extends State<DashboardScreen> {
         child: Column(
           children: [
             DropdownButton(
-              items: [
-                const DropdownMenuItem(value: "weekly", child: Text("This Week")),
-                const DropdownMenuItem(value: "monthly", child: Text("This Month")),
-                const DropdownMenuItem(value: "yearly", child: Text("This Year")),
-              ],
+              items: List.generate(list.length, (index) =>DropdownMenuItem(value: "${FeedbackModel.fromJson(list[index]).name}", child: Text("${FeedbackModel.fromJson(list[index]).name}")), ),
+              // items:
+
               alignment: Alignment.center,
               isExpanded: true,
+              value: time,
               underline: Container(),
-              onChanged: (value) {
-                setState(() {});
+              onChanged: ( value) {
+                time = value.toString();
+
+                setState(() {
+
+                  print(time);
+                });
               },
             ),
 
 
           ],
         ),
-      ),
+      ):Container()
 
     ];
   }

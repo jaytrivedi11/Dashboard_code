@@ -84,6 +84,22 @@ class ApiService {
     }
     return res.body;
   }
+  Future<String> getPoliceStationList() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var stationID = prefs.getString("subdivisionID")!;
+    var url =
+    Uri.parse(ApiConstants.baseUrl + ApiConstants.staton + stationID);
+
+    var res = await http.get(url);
+    var response = jsonDecode(res.body);
+    if (res.statusCode == 200) {
+      List<dynamic> list = jsonDecode(res.body);
+
+
+      return res.body;
+    }
+    return res.body;
+  }
   Future<String> getFeedbcakDetails(String feedbackid) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var url = Uri.parse(ApiConstants.baseUrl + ApiConstants.feedbackinfo + feedbackid);
