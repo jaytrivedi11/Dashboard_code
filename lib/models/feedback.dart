@@ -11,6 +11,7 @@ class FeedbackModel {
   String? feedback;
   String? date;
   int? iV;
+  String? sentiment;
 
   FeedbackModel(
       {this.sId,
@@ -24,7 +25,9 @@ class FeedbackModel {
         this.stars,
         this.feedback,
         this.date,
-        this.iV});
+        this.iV,
+        this.sentiment,
+      });
 
   FeedbackModel.fromJson(Map<String, dynamic> json) {
     sId = json['_id'];
@@ -39,6 +42,7 @@ class FeedbackModel {
     feedback = json['feedback'];
     date = json['date'];
     iV = json['__v'];
+    sentiment = json["sentiment"];
   }
 
   Map<String, dynamic> toJson() {
@@ -55,6 +59,7 @@ class FeedbackModel {
     data['feedback'] = this.feedback;
     data['date'] = this.date;
     data['__v'] = this.iV;
+    data["sentiment"] = this.sentiment;
     return data;
   }
 }

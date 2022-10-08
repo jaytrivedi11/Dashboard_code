@@ -241,8 +241,6 @@ class _DefaultScreenState extends State<DefaultScreen> {
                                                   frequencyData.add(temp);
                                                 }
 
-                                                print(snapshot.data!.body);
-
                                                 return Container(
                                                   height: size.height * 0.5,
                                                   child: SafeArea(
@@ -436,6 +434,131 @@ class _DefaultScreenState extends State<DefaultScreen> {
                               ),
                             )
                           : Container(),
+
+                      place == "subdivision"
+                          ? Container(
+                        margin: EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 10),
+                        // height: Responsive.isDesktop(context)
+                        //     ? size.height * 0.65
+                        //     : size.height * 1.6,
+                        child: Card(
+                          color: secondaryColor,
+                          child: Center(
+                            child: FutureBuilder<http.Response>(
+                              future: http.get(Uri.parse(
+                                ApiConstants.baseUrl +
+                                    ApiConstants.chartRoute +
+                                    time + ApiConstants.dataForSentimentChart +
+                                    id,
+                              )),
+                              builder: (context, snapshot) {
+                                if (snapshot.hasData) {
+                                  print(snapshot.data!.body);
+                                  List<AverageFrequency> positiveData =
+                                  [];
+                                  List<AverageFrequency> neutralData = [];
+                                  List<AverageFrequency> negativeData = [];
+                                  Map res =
+                                  jsonDecode(snapshot.data!.body);
+
+                                  res.forEach((key, value) {
+                                    positiveData.add(AverageFrequency(name: key, count: value["Positive"]));
+                                  },);
+
+                                  res.forEach((key, value) {
+                                    neutralData.add(AverageFrequency(name: key, count: value["Neutral"]));
+                                  },);
+
+                                  res.forEach((key, value) {
+                                    negativeData.add(AverageFrequency(name: key, count: value["Negative"]));
+                                  },);
+
+                                  return Container(
+                                    padding: EdgeInsets.all(25),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                      CrossAxisAlignment.start,
+                                      children: [
+                                        SizedBox(
+                                          height: 10,
+                                        ),
+                                        Text("Sentiment Analysis per station",
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 20)),
+                                        SizedBox(
+                                          height: 10,
+                                        ),
+                                        SafeArea(
+                                          child: SfCartesianChart(
+                                            primaryXAxis: CategoryAxis(
+                                              isInversed: true,
+                                              labelStyle:
+                                              Theme.of(context)
+                                                  .textTheme
+                                                  .bodyText1,
+                                            ),
+                                            primaryYAxis: NumericAxis(
+                                              interval: 1,
+                                              opposedPosition: true,
+                                              labelStyle:
+                                              Theme.of(context)
+                                                  .textTheme
+                                                  .bodyText1,
+                                            ),
+                                            series: [
+                                              BarSeries<AverageFrequency, String>(dataSource: positiveData, xValueMapper: (datum, index) => datum.name, yValueMapper: (datum, index) => datum.count, color: Colors.green, dataLabelMapper:
+                                                  (datum, index) =>
+                                                  datum.count
+                                                      .toString(),
+                                                dataLabelSettings:
+                                                DataLabelSettings(
+                                                    isVisible: true),
+                                                name: "Positive"
+                                              ),
+                                              BarSeries<AverageFrequency, String>(dataSource: neutralData, xValueMapper: (datum, index) => datum.name, yValueMapper: (datum, index) => datum.count, color: Colors.blue, dataLabelMapper:
+                                                  (datum, index) =>
+                                                  datum.count
+                                                      .toString(),
+                                                dataLabelSettings:
+                                                DataLabelSettings(
+                                                    isVisible: true),
+                                                name: "Neutral"
+                                              ),
+                                              BarSeries<AverageFrequency, String>(dataSource: negativeData, xValueMapper: (datum, index) => datum.name, yValueMapper: (datum, index) => datum.count, color: Colors.red, dataLabelMapper:
+                                                  (datum, index) =>
+                                                  datum.count
+                                                      .toString(),
+                                                dataLabelSettings:
+                                                DataLabelSettings(
+                                                    isVisible: true),
+                                                name: "Negative",
+                                              )
+                                            ],
+                                            legend: Legend(
+                                              isVisible: true,
+                                              textStyle:
+                                              Theme.of(context)
+                                                  .textTheme
+                                                  .bodyText1,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                } else {
+                                  return CircularProgressIndicator(
+                                    strokeWidth: 1,
+                                  );
+                                }
+                              },
+                            ),
+                          ),
+                        ),
+                      )
+                          : Container(),
                     ],
                   ),
                 ),
@@ -524,21 +647,153 @@ class _DefaultScreenState extends State<DefaultScreen> {
                 width: size.width * 0.20,
                 child: Card(
                   color: secondaryColor,
-                  child: Center(child: Text('Positive Feedbacks')),
+                  child: Center(child: FutureBuilder<http.Response>(
+                    future: http.get(
+                      place == "station"
+                          ? Uri.parse(
+                        ApiConstants.baseUrl +
+                            ApiConstants.chartRoute +
+                            time +
+                            ApiConstants.totalPositiveForStation +
+                            id,
+                      )
+                          : place == "subdivision"
+                          ? Uri.parse(
+                        ApiConstants.baseUrl +
+                            ApiConstants.chartRoute +
+                            time +
+                            ApiConstants.totalPositiveForSubdivision +
+                            id,
+                      )
+                          : Uri.parse(
+                        ApiConstants.baseUrl +
+                            ApiConstants.chartRoute +
+                            time +
+                            ApiConstants.totalFeedbackDistrict +
+                            id,
+                      ),
+                    ),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        return Text(
+                          jsonDecode(snapshot.data!.body)["total"].toString(),
+                          style: TextStyle(
+                            fontSize: 40,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        );
+                      } else {
+                        return const Center(
+                          child: CircularProgressIndicator(
+                            strokeWidth: 1,
+                          ),
+                        );
+                      }
+                    },
+                  ),
+                  ),
                 ),
               ),
               SizedBox(
                 width: size.width * 0.20,
                 child: Card(
                   color: secondaryColor,
-                  child: Center(child: Text('Neutral Feedbacks')),
+                  child: Center(child:
+                  FutureBuilder<http.Response>(
+                    future: http.get(
+                      place == "station"
+                          ? Uri.parse(
+                        ApiConstants.baseUrl +
+                            ApiConstants.chartRoute +
+                            time +
+                            ApiConstants.totalNeutralForStation +
+                            id,
+                      )
+                          : place == "subdivision"
+                          ? Uri.parse(
+                        ApiConstants.baseUrl +
+                            ApiConstants.chartRoute +
+                            time +
+                            ApiConstants.totalNeutralForSubdivision +
+                            id,
+                      )
+                          : Uri.parse(
+                        ApiConstants.baseUrl +
+                            ApiConstants.chartRoute +
+                            time +
+                            ApiConstants.totalFeedbackDistrict +
+                            id,
+                      ),
+                    ),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        return Text(
+                          jsonDecode(snapshot.data!.body)["total"].toString(),
+                          style: TextStyle(
+                            fontSize: 40,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        );
+                      } else {
+                        return const Center(
+                          child: CircularProgressIndicator(
+                            strokeWidth: 1,
+                          ),
+                        );
+                      }
+                    },
+                  ),
+                  ),
                 ),
               ),
               SizedBox(
                 width: size.width * 0.20,
                 child: Card(
                   color: secondaryColor,
-                  child: Center(child: Text('Negative Feedbacks')),
+                  child: Center(child: FutureBuilder<http.Response>(
+                    future: http.get(
+                      place == "station"
+                          ? Uri.parse(
+                        ApiConstants.baseUrl +
+                            ApiConstants.chartRoute +
+                            time +
+                            ApiConstants.totalNegativeForStation +
+                            id,
+                      )
+                          : place == "subdivision"
+                          ? Uri.parse(
+                        ApiConstants.baseUrl +
+                            ApiConstants.chartRoute +
+                            time +
+                            ApiConstants.totalNegativeForSubdivision +
+                            id,
+                      )
+                          : Uri.parse(
+                        ApiConstants.baseUrl +
+                            ApiConstants.chartRoute +
+                            time +
+                            ApiConstants.totalFeedbackDistrict +
+                            id,
+                      ),
+                    ),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        return Text(
+                          jsonDecode(snapshot.data!.body)["total"].toString(),
+                          style: TextStyle(
+                            fontSize: 40,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        );
+                      } else {
+                        return const Center(
+                          child: CircularProgressIndicator(
+                            strokeWidth: 1,
+                          ),
+                        );
+                      }
+                    },
+                  ),),
                 ),
               ),
             ],

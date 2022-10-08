@@ -117,7 +117,7 @@ class _SideMenuState extends State<SideMenu> {
           //   press: () {},
           // ),
 
-          DrawerListTile(
+          level == 0 ? DrawerListTile(
             title: "Settings",
             svgSrc: "assets/icons/menu_setting.svg",
             press: () {
@@ -132,7 +132,7 @@ class _SideMenuState extends State<SideMenu> {
               ),transitionDuration: Duration.zero, reverseTransitionDuration: Duration.zero,),);
 
             },
-          ),
+          ) : Container(),
 
           level == 1 ? DrawerListTile(
             title: "Manage Subdivision",

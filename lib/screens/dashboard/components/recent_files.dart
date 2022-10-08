@@ -92,6 +92,7 @@ class RecentFiles extends StatelessWidget {
 
 DataRow recentFileDataRow(
     FeedbackModel fileInfo, int position, BuildContext context) {
+  var size = MediaQuery.of(context).size;
   return DataRow2(
     onTap: () {
       // Navigator.push(context, PageRouteBuilder(pageBuilder: (context, animation, secondaryAnimation) => MultiProvider(
@@ -106,15 +107,20 @@ DataRow recentFileDataRow(
       showDialog(
           context: context,
           builder: (BuildContext context) {
-            return Card(
-              child: MultiProvider(
-                providers: [
-                  ChangeNotifierProvider(
-                    create: (context) => MenuController(),
+            return Container(
+              width: size.width * 0.8,
+              height: size.height * 0.8,
+              padding: EdgeInsets.symmetric(horizontal: 300),
+              child: Card(
+                child: MultiProvider(
+                  providers: [
+                    ChangeNotifierProvider(
+                      create: (context) => MenuController(),
+                    ),
+                  ],
+                  child: FeedbackInfo(
+                    feedbackId: fileInfo.sId,
                   ),
-                ],
-                child: FeedbackInfo(
-                  feedbackId: fileInfo.sId,
                 ),
               ),
             );

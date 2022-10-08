@@ -17,4 +17,14 @@ class ApiConstants {
   static String staton = '/list/stations/';
   static String generateExcel = '/station/generateExcel/';
 
+  static String totalPositiveForStation = "/positive/station/";
+  static String totalNegativeForStation = "/negative/station/";
+  static String totalNeutralForStation = "/neutral/station/";
+
+  static String totalPositiveForSubdivision = "/positive/subdivision/";
+  static String totalNegativeForSubdivision = "/negative/subdivision/";
+  static String totalNeutralForSubdivision = "/neutral/subdivision/";
+
+  static String dataForSentimentChart = "/sentiment/subdivision/";
+
 }
